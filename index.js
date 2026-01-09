@@ -33,7 +33,7 @@ app.post('/api/v1/register', async (req, res) => {
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
   // create new user
-  const newUser = await User.create({ username, password });
+  const newUser = await User.create({ username, password: hashedPassword });
   // send a response
   res.status(201).json({
     message: 'User registered successfully',
