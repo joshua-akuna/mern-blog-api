@@ -2,6 +2,7 @@ const express = require('express');
 require('dotenv').config();
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const connectDB = require('./middleware/connectDB');
 const User = require('./models/userModel');
 const port = process.env.PORT || 4000;
@@ -38,6 +39,29 @@ app.post('/api/v1/register', async (req, res) => {
   res.status(201).json({
     message: 'User registered successfully',
     user: { id: newUser._id, username: newUser.username },
+  });
+});
+
+app.post('/api/v1/login', async (req, res) => {
+  const { username, password } = req.body;
+  if (!username || !password) {
+    return res.status(400).json({ message: 'All fields are required' });
+  }
+  const user = await User.findOne({ username });
+  if (!user) {
+    return res.status(400).json({ message: 'Invalid username or password' });
+  }
+  if (!(await bcrypt.compare(password, user.password))) {
+    return res.status(400).json({ message: 'Invalid username or password' });
+  }
+  const token = jwt.sign(
+    { id: user._id, username: user.username },
+    process.env.JWT_SECRET,
+    { expiresIn: '1d' }
+  );
+  res.status(200).json({
+    message: 'Login successful',
+    user: { id: user._id, username: user.username },
   });
 });
 
