@@ -59,7 +59,7 @@ app.post('/api/v1/login', async (req, res) => {
     process.env.JWT_SECRET,
     { expiresIn: '1d' }
   );
-  res.status(200).json({
+  res.cookie('token', token).json({
     message: 'Login successful',
     user: { id: user._id, username: user.username },
   });
