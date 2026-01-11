@@ -59,4 +59,9 @@ const register = async (req, res) => {
   });
 };
 
-module.exports = { login, register };
+// controller function for getting user profile
+function profile(req, res) {
+  res.status(200).json(req.user);
+}
+
+module.exports = { login, register, profile };

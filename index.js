@@ -1,6 +1,7 @@
 const express = require('express');
 require('dotenv').config();
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const connectDB = require('./middleware/connectDB');
 const authRoute = require('./routes/authRoute');
 const port = process.env.PORT || 4000;
@@ -11,6 +12,7 @@ const app = express();
 // middlewares
 app.use(cors({ credentials: true, origin: 'http://localhost:5173' }));
 app.use(express.json());
+app.use(cookieParser());
 
 // database connection
 connectDB();
