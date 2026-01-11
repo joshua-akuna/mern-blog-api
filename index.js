@@ -11,7 +11,7 @@ const port = process.env.PORT || 4000;
 const app = express();
 
 // middlewares
-app.use(cors());
+app.use(cors({ credentials: true, origin: 'http://localhost:5173' }));
 app.use(express.json());
 
 // database connection
@@ -59,7 +59,8 @@ app.post('/api/v1/login', async (req, res) => {
     process.env.JWT_SECRET,
     { expiresIn: '1d' }
   );
-  res.cookie('token', token).json({
+  res.cookie('token', token, { httpOnly: true, maxAge: 60 * 60 * 1000 });
+  res.status(200).json({
     message: 'Login successful',
     user: { id: user._id, username: user.username },
   });
