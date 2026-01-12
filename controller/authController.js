@@ -61,7 +61,16 @@ const register = async (req, res) => {
 
 // controller function for getting user profile
 function profile(req, res) {
-  res.status(200).json(req.user);
+  const { username, id } = req.user;
+  res.status(200).json({ id, username });
 }
 
-module.exports = { login, register, profile };
+// controller function for logging out
+function logout(req, res) {
+  // clears cookies
+  res.clearCookie('token', { httpOnly: true });
+  // return json
+  res.json('ok');
+}
+
+module.exports = { login, register, profile, logout };
