@@ -69,6 +69,7 @@ function profile(req, res) {
 function logout(req, res) {
   // clears cookies
   res.clearCookie('token', { httpOnly: true });
+  res.cookie('token', '');
   // return json
   res.json('ok');
 }
