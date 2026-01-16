@@ -1,6 +1,7 @@
 const express = require('express');
 require('dotenv').config();
 const cors = require('cors');
+const path = require('path');
 const cookieParser = require('cookie-parser');
 const connectDB = require('./middleware/connectDB');
 const authRoute = require('./routes/authRoute');
@@ -18,7 +19,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // serve static files
-app.use('/uploads', express.static('uploads'));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // database connection
 connectDB();
