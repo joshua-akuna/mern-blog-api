@@ -1,5 +1,5 @@
 const createPost = (req, res) => {
-  return res.json('Creating a new post');
+  return res.json(req.file);
 };
 
 module.exports = { createPost };
