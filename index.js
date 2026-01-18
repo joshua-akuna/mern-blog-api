@@ -26,7 +26,7 @@ connectDB();
 
 // api endpoint for authentication routes
 app.use('/api/v1/auth', authRoute);
-app.use('/api/v1/post', postRoute);
+app.use('/api/v1/posts', postRoute);
 
 app.use((error, req, res, next) => {
   if (error instanceof multer.MulterError) {
