@@ -16,7 +16,13 @@ const createPost = async (req, res) => {
     }
 
     const cover = req.file ? `/uploads/${req.file.filename}` : null;
-    const post = await Post.create({ title, summary, content, cover });
+    const post = await Post.create({
+      title,
+      summary,
+      content,
+      cover,
+      author: req.user.id,
+    });
     res.status(201).json(post);
   } catch (error) {
     if (req.file) {
@@ -32,7 +38,10 @@ const createPost = async (req, res) => {
 };
 
 const getPosts = async (req, res) => {
-  const posts = await Post.find();
+  const posts = await Post.find()
+    .populate('author', ['username'])
+    .sort({ createdAt: -1 })
+    .limit(20);
   res.status(200).json(posts);
 };
 
