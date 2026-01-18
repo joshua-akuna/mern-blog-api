@@ -45,4 +45,8 @@ const getPosts = async (req, res) => {
   res.status(200).json(posts);
 };
 
-module.exports = { createPost, getPosts };
+const getPost = (req, res) => {
+  res.json('Post for 1');
+};
+
+module.exports = { createPost, getPosts, getPost };
