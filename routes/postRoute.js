@@ -5,7 +5,7 @@ const verifyJWT = require('../middleware/verifyJWT');
 const multer = require('multer');
 const upload = require('../middleware/upload');
 
-router.post('/', upload.single('file'), createPost);
+router.post('/', verifyJWT, upload.single('file'), createPost);
 router.get('/', getPosts);
 
 module.exports = router;
