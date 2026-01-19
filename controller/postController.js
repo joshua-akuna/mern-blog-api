@@ -32,7 +32,6 @@ const createPost = async (req, res) => {
         console.error('Error deleting file:', unlinkError);
       }
     }
-
     res.status(500).json({ Message: error.message });
   }
 };
@@ -45,8 +44,14 @@ const getPosts = async (req, res) => {
   res.status(200).json(posts);
 };
 
-const getPost = (req, res) => {
-  res.json('Post for 1');
+const getPost = async (req, res) => {
+  const { id } = req.params;
+  const post = await Post.findById(id).populate('author', ['username']);
+  res.json(post);
+};
+
+const updatePost = (req, res) => {
+  res.json('Updated post');
 };
 
 module.exports = { createPost, getPosts, getPost };
