@@ -50,8 +50,50 @@ const getPost = async (req, res) => {
   res.json(post);
 };
 
-const updatePost = (req, res) => {
-  res.json('Updated post');
+// upload post with optional file upload
+const updatePost = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, summary, content } = req.body;
+
+    const post = await Post.findById(id);
+
+    if (!post) {
+      if (req.file) {
+        await fs.unlink(req.file.path);
+      }
+      return res.status(404).json({ message: 'Post not found' });
+    }
+
+    // update fields
+    post.title = title || post.title;
+    post.summary = summary || post.summary;
+    post.content = content || post.content;
+
+    // handle file replacement
+    if (req.file) {
+      // Delere old file if exist
+      if (post.cover) {
+        const oldFilePath = path.join(__dirname, '..', post.cover);
+        console.log(oldFilePath);
+        try {
+          await fs.unlink(oldFilePath);
+        } catch (error) {
+          console.error('Error deleting old file: ', error);
+        }
+      }
+      post.cover = `/uploads/${req.file.filename}`;
+    }
+    // updates current post
+    await post.save();
+
+    res.status(200).json({ message: 'Post updated successfully', data: post });
+  } catch (error) {
+    if (req.file) {
+      await fs.unlink(req.file.path);
+    }
+    res.status(500).json({ message: error.message });
+  }
 };
 
-module.exports = { createPost, getPosts, getPost };
+module.exports = { createPost, getPosts, getPost, updatePost };

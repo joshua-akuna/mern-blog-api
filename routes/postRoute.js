@@ -4,6 +4,7 @@ const {
   createPost,
   getPosts,
   getPost,
+  updatePost,
 } = require('../controller/postController');
 const verifyJWT = require('../middleware/verifyJWT');
 const multer = require('multer');
@@ -12,6 +13,6 @@ const upload = require('../middleware/upload');
 router.post('/', verifyJWT, upload.single('file'), createPost);
 router.get('/', getPosts);
 router.get('/:id', getPost);
-// router.put('/:id', verifyJWT, upload.single('file'), createPost);
+router.put('/:id', verifyJWT, upload.single('file'), updatePost);
 
 module.exports = router;
