@@ -96,4 +96,34 @@ const updatePost = async (req, res) => {
   }
 };
 
-module.exports = { createPost, getPosts, getPost, updatePost };
+const deletePost = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // get post with id
+    const post = await Post.findById(id);
+    // if post does not exist, return a 404
+    if (!post) {
+      return res.status(404).json({ message: 'Post not found.' });
+    }
+
+    // Delete associated file
+    if (post.cover) {
+      const filePath = path.join(__dirname, '..', post.cover);
+      console.log(filePath);
+      try {
+        await fs.unlink(filePath);
+      } catch (error) {
+        console.error('Error deleting file: ', error);
+      }
+    }
+
+    await Post.findByIdAndDelete(id);
+
+    res.status(200).json({ message: 'Post deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = { createPost, getPosts, getPost, updatePost, deletePost };
