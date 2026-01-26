@@ -27,7 +27,9 @@ const login = async (req, res) => {
   );
   // set the token in a cookie
   res.cookie('token', token, {
-    httpOnly: true,
+    httpOnly: true, // prevents javascript access
+    secure: true, // Must be true on vercel, uses https
+    samesite: none, // Must be 'none' for cross site cookies
     maxAge: 60 * 60 * 1000 * 24 * 7,
   });
   // send a response
@@ -71,7 +73,7 @@ function profile(req, res) {
 // controller function for logging out
 function logout(req, res) {
   // clears cookies
-  res.clearCookie('token', { httpOnly: true });
+  res.clearCookie('token', { httpOnly: true, secure: true, samesite: none });
   res.cookie('token', '');
   // return json
   res.json('ok');
