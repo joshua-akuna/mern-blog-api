@@ -12,8 +12,12 @@ const port = process.env.PORT || 4000;
 // initialize express app
 const app = express();
 
+const corsOption = {
+  origin: ['http://localhost:5173', 'remnets.netlify.app'],
+  credentials: true,
+};
 // middlewares
-app.use(cors({ credentials: true, origin: 'http://localhost:5173' }));
+app.use(cors(corsOption));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -25,6 +29,9 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 connectDB();
 
 // api endpoint for authentication routes
+app.get('/', (req, res) => {
+  return res.json('Alright');
+});
 app.use('/api/v1/auth', authRoute);
 app.use('/api/v1/posts', postRoute);
 
