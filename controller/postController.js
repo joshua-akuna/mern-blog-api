@@ -1,37 +1,48 @@
 const fs = require('fs').promises;
+const { put, del } = require('@vercel/blob');
 const path = require('path');
 const Post = require('../models/postModel');
+const { log } = require('console');
 
 const createPost = async (req, res) => {
   try {
     const { title, summary, content } = req.body;
 
     // validate required fields
-    if (!title || !summary) {
-      // delete uploaded file if validation fails
-      if (req.file) {
-        await fs.unlink(req.file.path);
-      }
-      return res.status(400).json({ message: 'All fields are mandatory' });
-    }
+    // if (!title || !summary) {
+    //   // delete uploaded file if validation fails
+    //   if (req.file) {
+    //     await fs.unlink(req.file.path);
+    //   }
+    //   return res.status(400).json({ message: 'All fields are mandatory' });
+    // }
 
-    const cover = req.file ? `/uploads/${req.file.filename}` : null;
+    // const cover = req.file ? `/uploads/${req.file.filename}` : null;
+
+    const filename = `${Date.now()}-${req.file.originalname}`;
+    const blob = await put(filename, req.file.buffer, {
+      access: 'public',
+      token: process.env.BLOB_READ_WRITE_TOKEN,
+      contentType: req.file.mimetype,
+    });
+    // console.log(blob.url);
+
     const post = await Post.create({
       title,
       summary,
       content,
-      cover,
+      cover: blob.url,
       author: req.user.id,
     });
     res.status(201).json(post);
   } catch (error) {
-    if (req.file) {
-      try {
-        await fs.unlink(req.file.path);
-      } catch (unlinkError) {
-        console.error('Error deleting file:', unlinkError);
-      }
-    }
+    // if (req.file) {
+    //   try {
+    //     await fs.unlink(req.file.path);
+    //   } catch (unlinkError) {
+    //     console.error('Error deleting file:', unlinkError);
+    //   }
+    // }
     res.status(500).json({ Message: error.message });
   }
 };
@@ -58,12 +69,12 @@ const updatePost = async (req, res) => {
 
     const post = await Post.findById(id);
 
-    if (!post) {
-      if (req.file) {
-        await fs.unlink(req.file.path);
-      }
-      return res.status(404).json({ message: 'Post not found' });
-    }
+    // if (!post) {
+    //   if (req.file) {
+    //     await fs.unlink(req.file.path);
+    //   }
+    //   return res.status(404).json({ message: 'Post not found' });
+    // }
 
     // update fields
     post.title = title || post.title;
@@ -72,26 +83,36 @@ const updatePost = async (req, res) => {
 
     // handle file replacement
     if (req.file) {
-      // Delere old file if exist
+      // Delete old file if exist
       if (post.cover) {
-        const oldFilePath = path.join(__dirname, '..', post.cover);
-        console.log(oldFilePath);
-        try {
-          await fs.unlink(oldFilePath);
-        } catch (error) {
-          console.error('Error deleting old file: ', error);
-        }
+        await del(post.cover, {
+          token: process.env.BLOB_READ_WRITE_TOKEN,
+        });
+        // const oldFilePath = path.join(__dirname, '..', post.cover);
+        // // console.log(oldFilePath);
+        // try {
+        //   await fs.unlink(oldFilePath);
+        // } catch (error) {
+        //   console.error('Error deleting old file: ', error);
+        // }
       }
-      post.cover = `/uploads/${req.file.filename}`;
+      const filename = `${Date.now()}-${req.file.originalname}`;
+      const blob = await put(filename, req.file.buffer, {
+        access: 'public',
+        token: process.env.BLOB_READ_WRITE_TOKEN,
+        contentType: req.file.mimetype,
+      });
+      post.cover = blob.url;
+      // post.cover = `/uploads/${req.file.filename}`;
     }
     // updates current post
     await post.save();
 
     res.status(200).json({ message: 'Post updated successfully', data: post });
   } catch (error) {
-    if (req.file) {
-      await fs.unlink(req.file.path);
-    }
+    // if (req.file) {
+    //   await fs.unlink(req.file.path);
+    // }
     res.status(500).json({ message: error.message });
   }
 };
@@ -109,13 +130,17 @@ const deletePost = async (req, res) => {
 
     // Delete associated file
     if (post.cover) {
-      const filePath = path.join(__dirname, '..', post.cover);
-      // console.log(filePath);
-      try {
-        await fs.unlink(filePath);
-      } catch (error) {
-        console.error('Error deleting file: ', error);
-      }
+      await del(post.cover, {
+        token: process.env.BLOB_READ_WRITE_TOKEN,
+      });
+
+      // const filePath = path.join(__dirname, '..', post.cover);
+      // // console.log(filePath);
+      // try {
+      //   await fs.unlink(filePath);
+      // } catch (error) {
+      //   console.error('Error deleting file: ', error);
+      // }
     }
 
     await Post.findByIdAndDelete(id);
