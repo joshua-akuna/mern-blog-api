@@ -23,14 +23,14 @@ const login = async (req, res) => {
   const token = jwt.sign(
     { id: user._id, username: user.username },
     process.env.JWT_SECRET,
-    { expiresIn: '7d' },
+    { expiresIn: '24h' },
   );
   // set the token in a cookie
   res.cookie('token', token, {
     httpOnly: true, // prevents javascript access
     secure: true, // Must be true on vercel, uses https
     samesite: 'none', // Must be 'none' for cross site cookies
-    maxAge: 60 * 60 * 1000 * 24 * 7,
+    maxAge: 60 * 60 * 1000 * 24,
   });
   // send a response
   res.status(200).json({
