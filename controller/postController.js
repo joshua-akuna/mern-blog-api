@@ -110,7 +110,7 @@ const deletePost = async (req, res) => {
     // Delete associated file
     if (post.cover) {
       const filePath = path.join(__dirname, '..', post.cover);
-      console.log(filePath);
+      // console.log(filePath);
       try {
         await fs.unlink(filePath);
       } catch (error) {

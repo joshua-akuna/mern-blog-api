@@ -16,8 +16,22 @@ const corsOption = {
   origin: ['http://localhost:5173', 'https://remnets.netlify.app'],
   credentials: true,
 };
+
+const allowedOrigin = ['http://localhost:5173', 'https://remnets.netlify.app'];
+
 // middlewares
-app.use(cors(corsOption));
+app.use(
+  cors({
+    credentials: true,
+    origin: (origin, callback) => {
+      if (allowedOrigin.includes(origin) || !origin) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by cors'));
+      }
+    },
+  }),
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
