@@ -22,7 +22,7 @@ const createPost = async (req, res) => {
     const filename = `${Date.now()}-${req.file.originalname}`;
     const blob = await put(filename, req.file.buffer, {
       access: 'public',
-      token: process.env.BLOB_READ_WRITE_TOKEN,
+      // token: process.env.BLOB_READ_WRITE_TOKEN,
       contentType: req.file.mimetype,
     });
     // console.log(blob.url);
