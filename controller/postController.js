@@ -47,6 +47,7 @@ const createPost = async (req, res) => {
   }
 };
 
+// get all posts
 const getPosts = async (req, res) => {
   const posts = await Post.find()
     .populate('author', ['username'])
@@ -55,6 +56,7 @@ const getPosts = async (req, res) => {
   res.status(200).json(posts);
 };
 
+// get single post by id
 const getPost = async (req, res) => {
   const { id } = req.params;
   const post = await Post.findById(id).populate('author', ['username']);
@@ -120,8 +122,7 @@ const updatePost = async (req, res) => {
 const deletePost = async (req, res) => {
   try {
     const { id } = req.params;
-
-    // get post with id
+    // get post by id
     const post = await Post.findById(id);
     // if post does not exist, return a 404
     if (!post) {
@@ -142,9 +143,9 @@ const deletePost = async (req, res) => {
       //   console.error('Error deleting file: ', error);
       // }
     }
-
+    // delete post from database
     await Post.findByIdAndDelete(id);
-
+    // return success response
     res.status(200).json({ message: 'Post deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: error.message });
