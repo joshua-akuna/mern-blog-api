@@ -47,7 +47,7 @@ const createPost = async (req, res) => {
   }
 };
 
-// get all posts
+// get all posts, populate author username and sort by creation date
 const getPosts = async (req, res) => {
   const posts = await Post.find()
     .populate('author', ['username'])
